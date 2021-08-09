@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include('partials/head') %>
+    <title>TM | Login</title>
+  </head>
+
+  <body>
+    <%- include('partials/dashboardHeader') %> <%- include ("partials/messages")
+    %>
+    <div class="container workspace">
+      <div class="d-flex justify-content-between align-items-center py-4">
+        <h5>My Workspaces</h5>
+
+        <% if (role === 'teacher') { %>
+
+        <div>
+          <!-- Button trigger modal -->
+          <button
+            type="button"
+            class="btn btn-primary"
+            data-bs-toggle="modal"
+            data-bs-target="#exampleModal"
+          >
+            Create new Workspace
+          </button>
+
+          <!-- Modal -->
+          <div
+            class="modal fade"
+            id="exampleModal"
+            tabindex="-1"
+            aria-labelledby="exampleModalLabel"
+            aria-hidden="true"
+          >
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalLabel">
+                    New Workspace
+                  </h5>
+                  <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                  ></button>
+                </div>
+                <div class="modal-body">
+                  <form action="/api/createworkspace" method="POST">
+                    <div class="form-group">
+                      <label class="py-2">Title</label>
+                      <input
+                        type="text"
+                        required
+                        name="title"
+                        class="form-control"
+                        placeholder="Title"
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label class="py-2">Description</label>
+                      <input
+                        type="text"
+                        required
+                        name="description"
+                        class="form-control"
+                        placeholder="Description"
+                      />
+                    </div>
+
+                    <div class="form-group pb-3">
+                      <label class="py-2">Select Student</label>
+                      <select class="form-control" name="studentid">
+                        <% students.forEach(function(item){ %>
+                        <option value="<%= item.id%>">
+                          <%= item.username%>
+                        </option>
+                        <%}) %>
+                      </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                      Create
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <% } %>
+      </div>
+
+      <% if (workspace.length === 0) { %>
+      <div
+        class="alert alert-warning alert-dismissible fade show showmessage"
+        role="alert"
+      >
+        No workspace available
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="alert"
+          aria-label="Close"
+        ></button>
+      </div>
+      <% } %>
+
+      <div class="d-flex pt-5 workcard">
+        <% workspace.forEach(function(item){ %>
+        <div
+          class="card text-dark bg-light mb-3 workspace-card"
+          style="width: 18rem"
+        >
+          <div class="card-header bg-primary text-white">
+            <%= item.title%>
+            <a href="/api/deleteWorkSpace/<%= item.id%>">delete</a>
+          </div>
+          <div class="card-body">
+            <p>Description: <%= item.description%></p>
+            <p>10 Post, 5 Comment</p>
+
+            <% if(role === 'teacher'){ %>
+            <p>Student: <%= item.studentname%></p>
+            <% } else{ %>
+            <p>Teacher: <%= item.teachername%></p>
+            <% } %>
+
+            <% if(role === 'teacher'){ %>
+
+            <a
+              href="/myclass?classid=<%= item.id%>&studentid=<%= item.studentid%>&teacherid=<%= item.teacherid%>"
+              type="button"
+              class="btn btn-secondary"
+              >view</a
+            >
+            <% } else{ %>
+
+              <a
+              href="/myclass?classid=<%= item.id%>&teacherid=<%= item.teacherid%>&studentid=<%= item.studentid%>"
+              type="button"
+              class="btn btn-secondary"
+              >view</a
+            >
+            <% } %>
+
+          </div>
+        </div>
+        <%}) %>
+      </div>
+    </div>
+  </body>
+</html>
