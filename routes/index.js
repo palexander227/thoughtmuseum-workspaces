@@ -4,7 +4,7 @@ const { ensureAuthenticated, forwardAuthenticated } = require("../config/auth");
 const { getComment } = require("../controller/comment");
 const { getMyclass } = require("../controller/myclass");
 const { getPost } = require("../controller/post");
-const { getAllUser } = require("../controller/user");
+const { getAllUser } = require("../controller/User");
 const { getWorkSpace } = require("../controller/workspace");
 
 // Home Page
