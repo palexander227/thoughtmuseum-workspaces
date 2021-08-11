@@ -1,8 +1,9 @@
 const Comment = require("../models/Comment");
-var moment = require("moment");
+const moment = require("moment");
 
 exports.createComment = async (req, res, next) => {
   const { id, teacherid, studentid, postid } = req.params;
+
   try {
     const { user } = res.locals;
     const { content } = req.body;
@@ -14,7 +15,9 @@ exports.createComment = async (req, res, next) => {
       content,
       teacherid,
     });
+    
     const saveComment = await newComment.save();
+
     if (saveComment) {
       console.log(saveComment);
       req.flash("success_msg", "Comment created successfully");
@@ -33,25 +36,21 @@ exports.createComment = async (req, res, next) => {
 exports.getComment = async (req, res, next) => {
   const { teacherid } = req.query;
 
-  let array = [];
+  const comments = [];
   try {
     const comment = await Comment.findAll();
 
-    const filterdata = comment.filter(
-      (item) => item.dataValues.teacherid === teacherid
-    );
-    filterdata.map((item) => {
-      array.push({
+    comments = comment
+      .filter((item) => item.dataValues.teacherid === teacherid)
+      .map((item) => ({
         date: moment(item.dataValues.createdAt).utc().format("MMM Do"),
         username: item.dataValues.username,
         content: item.dataValues.content,
-      });
-    });
-
+      }));
   } catch (error) {
     console.log(error);
   }
-  res.locals.comment = array;
+  res.locals.comment = comments;
   next();
 };
 

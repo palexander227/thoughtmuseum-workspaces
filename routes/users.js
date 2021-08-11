@@ -1,34 +1,20 @@
+// Router
 const express = require("express");
 const router = express.Router();
-const passport = require("passport");
+
+// Auth
 const { forwardAuthenticated } = require("../config/auth");
-const { register } = require("../controller/User");
 
-// Login Page
+// Controller
+const { register, login, logout } = require("../controller/user");
+
+// Pages
 router.get("/login", forwardAuthenticated, (req, res) => res.render("login"));
+router.get("/register", forwardAuthenticated, (req, res) => res.render("register"));
 
-// Register Page
-router.get("/register", forwardAuthenticated, (req, res) =>
-  res.render("register")
-);
-
-// Register
+// API
 router.post("/register", register);
-
-// Login
-router.post("/login", (req, res, next) => {
-  passport.authenticate("local", {
-    successRedirect: "/dashboard",
-    failureRedirect: "/login",
-    failureFlash: true,
-  })(req, res, next);
-});
-
-// Logout
-router.get("/logout", (req, res) => {
-  req.logout();
-  req.flash("success_msg", "You are logged out");
-  res.redirect("/login");
-});
+router.post("/login", login);
+router.get("/logout", logout);
 
 module.exports = router;

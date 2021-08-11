@@ -1,5 +1,7 @@
 const Workspace = require("../models/Workspace");
-const Userdata = require("../models/user");
+const Post = require("../models/Post");
+const Userdata = require("../models/User");
+const Comment = require("../models/Comment");
 
 //GET WORK SPACE
 exports.getWorkSpace = async (req, res, next) => {
@@ -11,12 +13,73 @@ exports.getWorkSpace = async (req, res, next) => {
       const filterdata = workspace.filter(
         (item) => item.dataValues.teacherid === user.id
       );
-      let array = [];
-      filterdata.map((item) => {
-        array.push(item.dataValues);
-      });
-      res.locals.workspace = array;
+
+      // let array = [];
+      // filterdata.map((item) => {
+      //   array.push(item.dataValues);
+      // });
+
+      // Better - don't return the array
+      // let array = [];
+      // filterdata.forEach((item) => {
+      //   array.push(item.dataValues);
+      // });
+
+      // Best - use the returned array
+      const workspaces = filterdata.map(item => {
+        return item.dataValues
+      })
+
+      const postPromises = workspaces.map(workspace => {
+        return Post.findAll({
+          where: {
+            workspaceid: workspace.id
+          }
+        })
+      })
+
+      const postResults = await Promise.all(postPromises)
+      console.log('results test:', postResults)
+
+      const commentPromises = postResults.map(result => {
+        const promises = result.map(post => {
+          return Comment.findAll({
+            where: { postid: post.id }
+          })
+        })
+
+        return Promise.all(promises)
+      })
+
+      const commentResults = await Promise
+        .all(commentPromises)
+      console.log('commentResults test:', commentResults)
+
+      const counted = workspaces.map((workspace, index) => {
+        const postResult = postResults[index]
+
+        const postsCount = postResult.length
+
+        const commentResult = commentResults[index]
+        const commentsCount = commentResult.reduce(
+          (total, postComments) => {
+            return total + postComments.length
+          },
+          0
+        )
+
+        return {
+          ...workspace,
+          postsCount,
+          commentsCount
+        }
+      })
+
+      // console.log('counted test:', counted)
+
+      res.locals.workspace = counted;
     }
+
     if (user.role === "student") {
       const filterdata = workspace.filter(
         (item) => item.dataValues.studentid === user.id

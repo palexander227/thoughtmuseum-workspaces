@@ -53,7 +53,7 @@
     
               <%}) %>
 
-              <form action="/api/createComment/<%= myclass.id %>/<%= myclass.teacherid %>/<%= myclass.studentid %>/<%= item.id %>" method="POST">
+              <form action="/api/comment/create/<%= myclass.id %>/<%= myclass.teacherid %>/<%= myclass.studentid %>/<%= item.id %>" method="POST">
                 <div class="input-group mb-3">
                   <input
                     type="text"
@@ -71,10 +71,8 @@
             </div>
           <% }) %>
 
-          <% if (role === 'teacher'){ %>
           <div class="chat-box">
-
-            <form action="/api/createPost/<%= myclass.id %>/<%= myclass.studentid %>/<%= myclass.teacherid %>/<%= classid %>"" method="POST">
+            <form action="/api/post/create/<%= myclass.id %>/<%= myclass.studentid %>/<%= myclass.teacherid %>/<%= classid %>" method="POST">
               <div class="input-group mb-3">
                 <input
                   type="text"
@@ -89,9 +87,6 @@
               </div>
             </form>
           </div>
-
-          <% } %>
-
         </div>
       </div>
     </div>

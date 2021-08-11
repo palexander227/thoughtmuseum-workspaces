@@ -35,28 +35,22 @@ exports.createPost = async (req, res, next) => {
 exports.getPost = async (req, res, next) => {
   const { classid: workspaceid } = req.query;
   const comments = await getComments();
-  
-  console.log('comments ----->', comments);
-  console.log('workspaceid ----->', workspaceid);
 
-  let array = [];
   try {
     const posts = await Post.findAll();
-    
-    console.log('Posts:', posts)
 
-    array = posts.filter((post) => post.workspaceid === parseInt(workspaceid)).map((item) => ({
-      id: item.id,
-      date: moment(item.dataValues.createdAt).utc().format("MMM Do"),
-      username: item.dataValues.username,
-      content: item.dataValues.content,
-      comments: comments.filter(({ postid }) => postid === item.id)
-    }));
-
+    res.locals.post = posts
+      .filter((post) => post.workspaceid === parseInt(workspaceid))
+      .map((item) => ({
+        id: item.id,
+        date: moment(item.dataValues.createdAt).utc().format("MMM Do"),
+        username: item.dataValues.username,
+        content: item.dataValues.content,
+        comments: comments.filter(({ postid }) => postid === item.id)
+      }));
   } catch (error) {
     console.log(error);
   }
 
-  res.locals.post = array;
   next();
 };

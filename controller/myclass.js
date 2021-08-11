@@ -14,3 +14,19 @@ exports.getMyclass = async (req, res, next) => {
   }
   next();
 };
+
+exports.renderMyClass = (req, res) => {
+  const { classid } = req.query;
+
+  if (res.locals.workspace.length === 0) {
+    res.redirect("/dashboard");
+  } else {
+    res.render("myclass", {
+      name: req.user.username,
+      role: req.user.role,
+      myclass: res.locals.myclass,
+      post: res.locals.post,
+      classid
+    });
+  }
+};

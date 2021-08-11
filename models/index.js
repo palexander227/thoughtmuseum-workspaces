@@ -15,7 +15,7 @@ Workspace.belongsTo(Person, {
 
 // Comment
 Comment.belongsTo(Post, {
-  foreignKey: "postid"
+  foreignKey: "postid" // postId
 })
 Comment.belongsTo(Person, {
   foreignKey: 'author_id'

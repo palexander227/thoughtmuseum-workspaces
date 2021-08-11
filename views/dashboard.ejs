@@ -47,7 +47,7 @@
                   ></button>
                 </div>
                 <div class="modal-body">
-                  <form action="/api/createworkspace" method="POST">
+                  <form action="/api/workspace/create" method="POST">
                     <div class="form-group">
                       <label class="py-2">Title</label>
                       <input
@@ -114,11 +114,11 @@
         >
           <div class="card-header bg-primary text-white">
             <%= item.title%>
-            <a href="/api/deleteWorkSpace/<%= item.id%>">delete</a>
+            <a href="/api/workspace/delete/<%= item.id%>">delete</a>
           </div>
           <div class="card-body">
             <p>Description: <%= item.description%></p>
-            <p>10 Post, 5 Comment</p>
+            <p><%= item.postsCount %> Post, <%= item.commentsCount %> Comment</p>
 
             <% if(role === 'teacher'){ %>
             <p>Student: <%= item.studentname%></p>

@@ -1,5 +1,6 @@
-const Userdata = require("../models/user");
 const bcrypt = require("bcryptjs");
+const passport = require("passport");
+const Userdata = require("../models/User");
 
 exports.getAllUser = async (req, res, next) => {
   const result = await Userdata.findAll();
@@ -8,20 +9,16 @@ exports.getAllUser = async (req, res, next) => {
     const { user } = res.locals;
 
     if (user.role === "teacher") {
-      const filterdata = result.filter(
-        (item) => item.dataValues.role === "student"
-      );
-      let array = [];
-      filterdata.map((item) => {
-        array.push(item.dataValues);
-      });
-      res.locals.students = array;
+      res.locals.students = result
+        .filter(item => item.dataValues.role === "student")
+        .map(item => item.dataValues);
     }
   }
+  
   next();
 };
 
-//REGISTER
+// Register
 exports.register = async (req, res) => {
   const { username, email, pass, password2, role } = req.body;
   let errors = [];
@@ -36,7 +33,7 @@ exports.register = async (req, res) => {
     errors.push({ msg: "Password must be at least 6 characters" });
   }
   if (errors.length > 0) {
-    res.render("register", {
+    return res.render("register", {
       errors,
       username,
       email,
@@ -49,19 +46,35 @@ exports.register = async (req, res) => {
     const alreadyExistsUser = await Userdata.findOne({ where: { email } });
     if (alreadyExistsUser) {
       req.flash("success_msg", "Email already exist");
-      res.redirect("/register");
+      return res.redirect("/register");
     } else {
       const newUser = new Userdata({ username, email, password, role });
       const savedUser = await newUser.save();
       if (savedUser) {
         req.flash("success_msg", "Registered successfully");
-        res.redirect("/login");
+        return res.redirect("/login");
       } else {
         throw "Cannot register user at the moment!";
       }
     }
   } catch (err) {
     console.log(err);
-    res.redirect("/register");
+    return res.redirect("/register");
   }
+};
+
+// Login
+exports.login = (req, res, next) => {
+  passport.authenticate("local", {
+    successRedirect: "/dashboard",
+    failureRedirect: "/login",
+    failureFlash: true,
+  })(req, res, next);
+};
+
+// Logout
+exports.logout = (req, res) => {
+  req.logout();
+  req.flash("success_msg", "You are logged out");
+  res.redirect("/login");
 };
